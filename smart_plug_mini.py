@@ -259,7 +259,7 @@ def get_last_info_from_csv(
     last_m = 0.0
     last_y = 0.0
 
-    print(f"##### {csv_filename} ######################################")
+    log(f"##### {csv_filename} ######################################")
     last_line = get_last_line(csv_filename)
     if last_line != "":
         splitted = last_line.split(",")
@@ -277,7 +277,7 @@ def get_last_info_from_csv(
             if last_date_server > date_start_server:
                 last_date_server += relativedelta(hours=1)  # start with next hour
                 date_start_server = last_date_server
-                print(f"                  {last_date_str}")
+                log(f"                  {last_date_str}")
 
     return date_start_server, last_kwh, last_d, last_w, last_m, last_y
 
@@ -331,12 +331,12 @@ def do_kwh_counters() -> None:
         delta_m,
         delta_y,
     ) = get_last_info_from_csv(Path(f"{DEVICE_NAME}.csv"))
-    print(f"date_start local: {date_start_server.astimezone(ZONE_INFO_LOCAL)}")
-    print(f"now local       : {now_server.astimezone(ZONE_INFO_LOCAL)}")
+    log(f"date_start local: {date_start_server.astimezone(ZONE_INFO_LOCAL)}")
+    log(f"now local       : {now_server.astimezone(ZONE_INFO_LOCAL)}")
     while date_start_server < now_server:
         prev_date = date_start_server.astimezone(ZONE_INFO_LOCAL)
         date_end_server = date_start_server + relativedelta(months=1)
-        print(
+        log(
             f"{DEVICE_NAME}: from {date_start_server.astimezone(ZONE_INFO_LOCAL)} to {date_end_server.astimezone(ZONE_INFO_LOCAL)}"  # noqa
         )
         result = get_kwh_counters(

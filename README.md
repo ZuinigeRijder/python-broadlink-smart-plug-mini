@@ -7,6 +7,8 @@
 - [smart\_plug\_mini.cfg](#smart_plug_minicfg)
 - [smart\_plug\_mini.py](#smart_plug_minipy)
   - [Example standard output of smart\_plug\_mini.py](#example-standard-output-of-smart_plug_minipy)
+- [csv\_to\_google\_sheet.py](#csv_to_google_sheetpy)
+- [Configuration of gspread for "python csv\_to\_google\_sheet.py"](#configuration-of-gspread-for-python-csv_to_google_sheetpy)
 - [Example crontab to run hourly on Raspberry Pi or another linux system](#example-crontab-to-run-hourly-on-raspberry-pi-or-another-linux-system)
 - [Sniffing the e-Control App](#sniffing-the-e-control-app)
   - [Month request/response](#month-requestresponse)
@@ -17,6 +19,7 @@
     - [24 hour response](#24-hour-response)
   - [Playing around with the server API](#playing-around-with-the-server-api)
 
+---
 # Summary
 
 Get history kWh consumption of broadlink Smart Plug Mini (tested with model SP3S-EU) using the broadlink server and append later kWh measurements to a .csv file format per device.
@@ -24,6 +27,7 @@ Get history kWh consumption of broadlink Smart Plug Mini (tested with model SP3S
 I have 2 times model Smart plug SP3S-EU and tested with those.
 Probably this also works for other broadlink SP mini models.
 
+---
 # Quick start
 
 - Make sure you have installed Python 3.9 or higher. [Here is more information about installing Python](https://realpython.com/installing-python/)
@@ -32,6 +36,7 @@ Probably this also works for other broadlink SP mini models.
 - Configure [smart_plug_mini.cfg](#smart_plug_minicfg), e.g. MAC addresses
 - Run the [smart_plug_mini.py](#smart_plug_minipy) to generate per configured device a DEVICE_NAME.csv file from the configured datetime onwards
 
+---
 # Background
 
 I am using 2 Smart plug SP3S-EU since 2018. The e-control App was limited in functionality/views. One of the strange things is e.g. the fact that you cannot see the month December of the year before the current year. So I was looking around if someone already had a better solution. I found the library [python-broadlink](https://github.com/mjg59/python-broadlink), but this was only for local access to your broadlink smart plug devices (get direct power measurements). So I decided to try to [sniff the e-Control app, see here](#sniffing-the-e-control-app).
@@ -41,6 +46,7 @@ In short, it appeared way easier to get the historical data of my smart plug min
 So I started making [a simple standalone python script smart_plug_mini.py which appends the history data per hour in a csv file for each device](#smart_plug_minipy) and made [some parts configurable](#smart_plug_minicfg).
 Also the tool writes the Day, Weeks, Months and Years summaries to separate .csv files per device.
 
+---
 # python_broadlink_smart_plug_mini_info.py
 
 All the credits goes to [python-broadlink library](https://github.com/mjg59/python-broadlink).
@@ -59,6 +65,7 @@ Remarks for this example output:
 - the MAC addresses are not my real SP3S-EU MAC addresses (I changed them, also in the rest of the examples)
 - you have to configure the MAC addresses 32:AA:31:72:63:43 and 32:AA:31:72:62:40 in [smart_plug_mini.cfg](#smart_plug_minicfg)
 
+---
 # smart_plug_mini.cfg
 
 [This configuration file](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/smart_plug_mini.cfg) needs to be configured once for the smart_plug_mini.py script.
@@ -83,6 +90,7 @@ Remarks to the configuration:
 - start_dates: comma separated list of date per device you want to start filling the history in .csv files (note: when .csv file already exists, the start_date is ignored and last entry of csv file is taken for later measurements)
 - time_filter: this is the timefilter for hourly measurements, maybe you want to play with this setting
 
+---
 # smart_plug_mini.py
 
 Simple Python3 script retrieve (history) kWh values for the configured Smart Plug mini devices.
@@ -104,7 +112,7 @@ OUTPUTFILES (for each configured DEVICE_NAME):
 - DEVICE_NAME.months.csv: months summary, [example](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.months.csv)
 - DEVICE_NAME.years.csv: years summary, [example](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.years.csv)
 
-
+---
 ## Example standard output of smart_plug_mini.py
 
 ```
@@ -177,6 +185,77 @@ Some remarks from this example:
 A screenshot for [example spreadsheet Badkamer.xlsx](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.xlsx) which has imported a larger Badkamer.csv:
 - ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.xlsx.jpg)
 
+---
+# csv_to_google_sheet.py
+
+Simple Python3 script to read the smart_plug_mini.py generated csv files and write a summary for each device to a separate Google spreadsheet.
+
+Note: you need to install the package gspread and configure gspread, [see here for the configuration](#configuration-of-gspread-for-python-csv_to_google_sheetpy)
+
+Usage:
+```
+python csv_to_google_sheet.py
+```
+INPUTFILES:
+- smart_plug_mini.cfg
+- for each configured DEVICE_NAME:
+- - DEVICE_NAME.csv
+- - DEVICE_NAME.days.csv
+- - DEVICE_NAME.weeks.csv
+- - DEVICE_NAME.months.csv
+- - DEVICE_NAME.years.csv
+
+Standard output:
+- progress of what is done
+
+OUTPUT SPREADSHEET:
+- DEVICE_NAME.SP (for each configured DEVICE_NAME)
+
+So the smart_plug_mini.py tool runs on my Raspberry Pi server, but I want to look at the results, without having to login to my server. So another tool has been made, which copies a summary to a google spreadsheet for each device: csv_to_google_sheet.py
+
+The Google spreadsheet contains kWh usage, including nice diagrams, when you [import the example Badkamer.SP.xlsx spreadsheet in Google Spreadsheet](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.SP.xlsx):
+- last written Date, Time, kWh, Hour, Day, Week, Month, Year
+- last 48 hours
+- last 32 days
+- last 27 weeks
+- last 25 months
+- last 25 years ;-)
+
+A short video of how it can look on an Android phone, [can be found here](https://www.youtube.com/shorts/p4IWoX7yNpE).
+Of course you can also view the Google Spreadsheet on your computer or tablet, e.g. Windows or Mac.
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=p4IWoX7yNpE" target="_blank"><img src="http://img.youtube.com/vi/p4IWoX7yNpE/0.jpg" alt="Broadlink Smart Plug Mini showing csv results in Google Spreadsheet" width="240" height="180" border="10" /></a>
+
+---
+# Configuration of gspread for "python csv_to_google_sheet.py"
+For updating a Google Spreadsheet, csv_to_google_sheet.py is using the package gspread.
+For Authentication with Google Spreadsheet you have to configure authentication for gspread.
+This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
+
+The csv_to_google_sheet.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
+
+Follow the steps in this link above, here is the summary of these steps:
+- Enable API Access for a Project
+- - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
+- - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
+- - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
+- For Bots: Using Service Account
+- - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
+- - Fill out the form
+- - Click "Create" and "Done".
+- - Press "Manage service accounts" above Service Accounts.
+- - Press on : near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
+- - Select JSON key type and press "Create".
+- - You will automatically download a JSON file with credentials
+- - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
+- - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
+- Setup a Google Spreasheet to be updated by csv_to_google_sheet.py (for each device one google spreadsheet)
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: DEVICE_NAME.SP (or [import the example Badkamer.SP.xlsx spreadsheet in Google Spreadsheet and rename it to DEVICE_NAME.SP](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.SP.xlsx))
+- - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+- run "python csv_to_google_sheet.py" and if everything is correct, the DEVICE_NAME.SP will be updated with a summary of the .csv files
+- configure to run "python csv_to_google_sheet.py" regularly, after having run "python smart_plug_mini.py"
+
+---
 # Example crontab to run hourly on Raspberry Pi or another linux system
 
 Example script [run_smart_plug_mini_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/run_smart_plug_mini_once.sh) to run smart_plug_mini.py on a linux based system.
@@ -186,13 +265,14 @@ Steps:
 - copy run_smart_plug_mini_once.sh, smart_plug_mini.cfg and smart_plug_mini.py in this smart_plug_mini directory
 - change inside smart_plug_mini.cfg the smart_plug_mini settings
 - chmod + x run_smart_plug_mini_once.sh
+- optionally: add running "python csv_to_google_sheet.py" to this script
 
 Add the following line in your crontab -e to run it once per hour 9 minutes later (crontab -e):
 ```
 9 * * * * ~/smart_plug_mini/run_smart_plug_mini_once.sh >> ~/smart_plug_mini/run_smart_plug_mini_once.log 2>&1
 ```
 
-
+---
 # Sniffing the e-Control App
 
 For the ones who also want to be able to sniff the calls from e-Control the App, this is how I did it (do it at your own risk):
