@@ -1,4 +1,4 @@
 python_version>=3.9
-broadlink==0.18.3
+broadlink==0.18.3       # only needed when you want to look up MAC addresses with the tool python_broadlink_smart_plug_mini_info.py, alternatively look for the MAC addresses in your router
 python_dateutil==2.8.2
-gspread==5.6.2
+gspread==5.6.2          # only needed when you use csv_to_google_sheet.py 

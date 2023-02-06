@@ -53,6 +53,9 @@ All the credits goes to [python-broadlink library](https://github.com/mjg59/pyth
 This small program just outputs the information from the library of the detected smart plug devices.
 The MAC addresses are needed for the configuration of the real tool.
 
+Note: Instead of using this tool, you can also look up the connected devices MAC addresses in your router, then you do not need to install the library python-broadlink.
+
+
 ## Example standard output of python_broadlink_smart_plug_mini_info.py
 
 ```
