@@ -32,9 +32,15 @@ Probably this also works for other broadlink SP mini models.
 
 - Make sure you have installed Python 3.9 or higher. [Here is more information about installing Python](https://realpython.com/installing-python/)
 - see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/requirements.txt) for extra needed packages
-- To get the MAC addresses for your Smart Plug Mini, run script [python_broadlink_smart_mini_info.py](#python_broadlink_smart_plug_mini_infopy) which uses the library [python-broadlink](https://github.com/mjg59/python-broadlink)
+- To get the MAC addresses for your Smart Plug Mini, run script [python_broadlink_smart_mini_info.py](#python_broadlink_smart_plug_mini_infopy) which uses the library [python-broadlink](https://github.com/mjg59/python-broadlink). Instead of using this tool, you can also look up the connected devices MAC addresses in your router, then you do not need to install the library python-broadlink.
 - Configure [smart_plug_mini.cfg](#smart_plug_minicfg), e.g. MAC addresses
 - Run the [smart_plug_mini.py](#smart_plug_minipy) to generate per configured device a DEVICE_NAME.csv file from the configured datetime onwards
+- optionally run [csv_to_google_sheet.py](#csv_to_google_sheetpy), but then you have to install and [configure package gspread](#configuration-of-gspread-for-python-csv_to_google_sheetpy)
+
+A short video of how csv_to_google_sheet.py can look on an Android phone, [can be found here](https://www.youtube.com/shorts/p4IWoX7yNpE).
+Of course you can also view the Google Spreadsheet on your computer or tablet, e.g. Windows or Mac.
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=p4IWoX7yNpE" target="_blank"><img src="http://img.youtube.com/vi/p4IWoX7yNpE/0.jpg" alt="Broadlink Smart Plug Mini showing csv results in Google Spreadsheet" width="240" height="180" border="10" /></a>
 
 ---
 # Background
