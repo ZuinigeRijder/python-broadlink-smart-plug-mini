@@ -222,7 +222,7 @@ OUTPUT SPREADSHEET:
 
 So the smart_plug_mini.py tool runs on my Raspberry Pi server, but I want to look at the results, without having to login to my server. So another tool has been made, which copies a summary to a google spreadsheet for each device: csv_to_google_sheet.py
 
-The Google spreadsheet contains kWh usage, including nice diagrams, when you [import the example Badkamer.SP.xlsx spreadsheet in Google Spreadsheet](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.SP.xlsx):
+The Google spreadsheet contains kWh usage, including nice diagrams, when you [copy the example Google spreadsheet Room.SP and rename it to DEVICE_NAME.SP](https://docs.google.com/spreadsheets/d/1SwFmaei27NlpJ6eP104U_PIEgxJK9A3VBEeYZHahY4g/edit?usp=sharing)):
 - last written Date, Time, kWh, Hour, Day, Week, Month, Year
 - last 48 hours
 - last 32 days
@@ -259,7 +259,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
 - - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
 - Setup a Google Spreasheet to be updated by csv_to_google_sheet.py (for each device one google spreadsheet)
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: DEVICE_NAME.SP (or [import the example Badkamer.SP.xlsx spreadsheet in Google Spreadsheet and rename it to DEVICE_NAME.SP](https://raw.githubusercontent.com/ZuinigeRijder/python-broadlink-smart-plug-mini/main/examples/Badkamer.SP.xlsx))
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: DEVICE_NAME.SP or [copy the example Google spreadsheet Room.SP and rename it to DEVICE_NAME.SP](https://docs.google.com/spreadsheets/d/1SwFmaei27NlpJ6eP104U_PIEgxJK9A3VBEeYZHahY4g/edit?usp=sharing))
 - - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
 - run "python csv_to_google_sheet.py" and if everything is correct, the DEVICE_NAME.SP will be updated with a summary of the .csv files
 - configure to run "python csv_to_google_sheet.py" regularly, after having run "python smart_plug_mini.py"
