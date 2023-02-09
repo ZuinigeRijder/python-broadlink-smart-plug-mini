@@ -275,7 +275,6 @@ def get_last_info_from_csv(
                 ZONE_INFO_SERVER
             )
             if last_date_server > date_start_server:
-                last_date_server += relativedelta(hours=1)  # start with next hour
                 date_start_server = last_date_server
                 log(f"                  {last_date_str}")
 
@@ -283,8 +282,8 @@ def get_last_info_from_csv(
 
 
 def compute(
-    fixed: tuple[float, float, datetime],
-    delta_x: float,
+    fixed: tuple[float, float, datetime],  # delta_kwh, prev_kwh, prev_date
+    cum_x: float,
     no_change: bool,
     fileinfo: FileInfo,
 ) -> float:
@@ -292,19 +291,19 @@ def compute(
     delta_kwh = fixed[0]
     new_delta_x = 0.0
     if no_change:
-        new_delta_x = delta_x + delta_kwh
+        new_delta_x = cum_x + delta_kwh
         _ = D and dbg(
-            f"delta_kwh: {delta_kwh:.2f} delta_x: {delta_x:.2f} new_delta_x: {new_delta_x:.2f}"  # noqa
+            f"delta_kwh: {delta_kwh:.2f} delta_x: {cum_x:.2f} new_delta_x: {new_delta_x:.2f}"  # noqa
         )
     else:
         new_delta_x = delta_kwh
         _ = D and dbg(
-            f"Change: delta_kwh: {delta_kwh:.2f} delta_x: {delta_x:.2f} new_delta_x: {new_delta_x:.2f}"  # noqa
+            f"Change: delta_kwh: {delta_kwh:.2f} delta_x: {cum_x:.2f} new_delta_x: {new_delta_x:.2f}"  # noqa
         )
         # append the previous day/week/month/year value to the summary csv file
         prev_kwh = fixed[1]
         prev_date = fixed[2]
-        line = f"{local_dt_str(prev_date)}, {prev_kwh:.2f}, {delta_x:.2f}"
+        line = f"{local_dt_str(prev_date)}, {prev_kwh:.2f}, {cum_x:.2f}"
         write_line(fileinfo, line)
 
     return new_delta_x
@@ -326,15 +325,16 @@ def do_kwh_counters() -> None:
     (
         date_start_server,
         prev_kwh,
-        delta_d,
-        delta_w,
-        delta_m,
-        delta_y,
+        cum_d,
+        cum_w,
+        cum_m,
+        cum_y,
     ) = get_last_info_from_csv(Path(f"{DEVICE_NAME}.csv"))
+    prev_date = date_start_server.astimezone(ZONE_INFO_LOCAL)
+    date_start_server += relativedelta(hours=1)  # start with next hour
     log(f"date_start local: {date_start_server.astimezone(ZONE_INFO_LOCAL)}")
     log(f"now local       : {now_server.astimezone(ZONE_INFO_LOCAL)}")
     while date_start_server < now_server:
-        prev_date = date_start_server.astimezone(ZONE_INFO_LOCAL)
         date_end_server = date_start_server + relativedelta(months=1)
         log(
             f"{DEVICE_NAME}: from {date_start_server.astimezone(ZONE_INFO_LOCAL)} to {date_end_server.astimezone(ZONE_INFO_LOCAL)}"  # noqa
@@ -373,12 +373,12 @@ def do_kwh_counters() -> None:
             )
 
             fixed = (delta_kwh, prev_kwh, prev_date)
-            delta_d = compute(fixed, delta_d, same_day(prev_date, date), CSV_DAYS)
-            delta_w = compute(fixed, delta_w, same_week(prev_date, date), CSV_WEEKS)
-            delta_m = compute(fixed, delta_m, same_month(prev_date, date), CSV_MONTHS)
-            delta_y = compute(fixed, delta_y, same_year(prev_date, date), CSV_YEARS)
+            cum_d = compute(fixed, cum_d, same_day(prev_date, date), CSV_DAYS)
+            cum_w = compute(fixed, cum_w, same_week(prev_date, date), CSV_WEEKS)
+            cum_m = compute(fixed, cum_m, same_month(prev_date, date), CSV_MONTHS)
+            cum_y = compute(fixed, cum_y, same_year(prev_date, date), CSV_YEARS)
 
-            line = f"{local_dt_str(date)}, {kwh:.2f}, {delta_kwh:.2f},  {delta_d:.2f},  {delta_w:.2f},  {delta_m:.2f},  {delta_y:.2f}"  # noqa
+            line = f"{local_dt_str(date)}, {kwh:.2f}, {delta_kwh:.2f},  {cum_d:.2f},  {cum_w:.2f},  {cum_m:.2f},  {cum_y:.2f}"  # noqa
             write_line(CSV_GLOBAL, line)
 
             prev_kwh = kwh
