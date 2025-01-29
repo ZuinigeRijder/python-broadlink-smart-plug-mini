@@ -146,6 +146,7 @@ def write_to_sheet(name: str, sheet: list) -> None:
     array = read_csv_and_write_to_sheet(array, name, "Month", (last, 5, 119, 26, 0, 7))
     array = read_csv_and_write_to_sheet(array, name, "Year", (last, 6, 147, 25, 0, 4))
 
+    array.append({"range": "A1", "values": [["Date"]]})  # go to beginning
     sheet.batch_update(array)
 
 
